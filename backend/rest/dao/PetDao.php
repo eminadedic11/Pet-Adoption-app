@@ -1,4 +1,5 @@
 <?php
+
 require_once 'BaseDao.php';
 
 class PetDao extends BaseDao {

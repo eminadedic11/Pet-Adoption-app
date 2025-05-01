@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../config.php';
 
 class BaseDao {
@@ -14,6 +15,7 @@ class BaseDao {
         try {
             $this->connection = new PDO("mysql:host=$servername;port=$port;dbname=$database", $username, $password);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+           // echo "Connected successfully";
         } catch(PDOException $e) {
             die("Connection failed: " . $e->getMessage());
         }
@@ -42,4 +44,7 @@ class BaseDao {
         return $this->connection->lastInsertId();
     }
 }
+
+$baseDao = new BaseDao();
+
 ?>
