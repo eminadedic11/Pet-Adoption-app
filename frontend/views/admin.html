@@ -1,11 +1,12 @@
 <body>
-    <section class="hero-wrap hero-wrap-2" style="background-image: url('../frontend/assets/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('../frontend/assets/images/bg_2.jpg');"
+        data-stellar-background-ratio="0.5">
         <div class="overlay"></div>
         <div class="container">
             <div class="row no-gutters slider-text align-items-end">
                 <div class="col-md-9 ftco-animate pb-5">
                     <p class="breadcrumbs mb-2">
-                        <span class="mr-2"><a href="index.html">Home <i class="ion-ios-arrow-forward"></i></a></span> 
+                        <span class="mr-2"><a href="index.html">Home <i class="ion-ios-arrow-forward"></i></a></span>
                         <span>Admin Panel <i class="ion-ios-arrow-forward"></i></span>
                     </p>
                     <h1 class="mb-0 bread">Admin Dashboard</h1>
@@ -18,38 +19,46 @@
         <div class="container">
             <div class="row">
                 <!-- Adoption Requests -->
-                <div class="col-md-6">
+                <div class="col-12 text-center">
                     <div class="card p-4">
                         <h4 class="mb-4">Adoption Requests</h4>
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>Request ID</th>
                                     <th>User Name</th>
                                     <th>Email</th>
                                     <th>Requested Pet</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>John Doe</td>
-                                    <td>john.doe@example.com</td>
-                                    <td>Max (Golden Retriever)</td>
-                                    <td><button class="btn btn-success">Approve</button></td>
-                                </tr>
-                                <tr>
-                                    <td>Sarah Lee</td>
-                                    <td>sarah.lee@example.com</td>
-                                    <td>Luna (Maine Coon)</td>
-                                    <td><button class="btn btn-success">Approve</button></td>
-                                </tr>
+                            <tbody id="adoptionRequestsTableBody">
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                <!-- User Overview -->
+                <div class="col-12 mt-5">
+                    <div class="card p-4">
+                        <h4 class="mb-4">User Overview</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userOverviewTableBody"></tbody>
+
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Contact Messages -->
-                <div class="col-md-6">
+                <div class="col-12 mt-5">
                     <div class="card p-4">
                         <h4 class="mb-4">Contact Messages</h4>
                         <div class="table-responsive">
@@ -81,43 +90,8 @@
                     </div>
                 </div>
 
-                <!-- Add New Pet -->
-                <div class="col-md-12 mt-5 text-center">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPetModal">
-                        Add a New Pet
-                    </button>
-                </div>
-
-                <!-- User Overview -->
-                <div class="col-md-6 mt-5">
-                    <div class="card p-4">
-                        <h4 class="mb-4">User Overview</h4>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Alice Brown</td>
-                                    <td>alice.brown@example.com</td>
-                                    <td>+1 234 567 890</td>
-                                </tr>
-                                <tr>
-                                    <td>David Smith</td>
-                                    <td>david.smith@example.com</td>
-                                    <td>+1 987 654 321</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <!-- Statistics from Reviews -->
-                <div class="col-md-6 mt-5">
+                <div class="col-12 mt-5">
                     <div class="card p-4">
                         <h4 class="mb-4">User Reviews Summary</h4>
                         <ul class="list-group">
@@ -136,12 +110,21 @@
                         </ul>
                     </div>
                 </div>
+
+                <!-- Add New Pet -->
+                <div class="col-md-12 mt-5 text-center">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPetModal">
+                        Add a New Pet
+                    </button>
+                </div>
+
             </div>
         </div>
     </section>
 
     <!-- Add Pet Modal -->
-    <div class="modal fade" id="addPetModal" tabindex="-1" role="dialog" aria-labelledby="addPetModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addPetModal" tabindex="-1" role="dialog" aria-labelledby="addPetModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -193,13 +176,19 @@
         </div>
     </div>
 
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="services/adoptionService.js"></script>
+    <script src="services/userService.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $("#addPetForm").submit(function(e) {
+        $("#addPetForm").submit(function (e) {
             e.preventDefault();
             alert("New pet added successfully!");
             $('#addPetModal').modal('hide');
         });
     </script>
+
+
 </body>

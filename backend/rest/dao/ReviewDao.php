@@ -3,27 +3,29 @@
 require_once 'BaseDao.php';
 
 class ReviewDao extends BaseDao {
-    public function getAllReviews() {
+
+    public function getAll() {
         return $this->fetchAll("SELECT * FROM reviews");
     }
 
-    public function getReviewById($id) {
+    public function getById($id) {
         return $this->fetchOne("SELECT * FROM reviews WHERE review_id = :id", [':id' => $id]);
     }
 
-    public function addReview($review) {
+    public function add($review) {
         $this->execute("INSERT INTO reviews (rating, comment, created_at, user_id)
                         VALUES (:rating, :comment, NOW(), :user_id)", $review);
         return $this->lastInsertId();
     }
 
-    public function updateReview($review) {
-        return $this->execute("UPDATE reviews SET rating = :rating, comment = :comment 
-                               WHERE review_id = :review_id", $review);
+    public function update($review) {
+        return $this->execute("UPDATE reviews SET 
+                                rating = :rating, 
+                                comment = :comment 
+                                WHERE review_id = :review_id", $review);
     }
 
-    public function deleteReview($id) {
+    public function delete($id) {
         return $this->execute("DELETE FROM reviews WHERE review_id = :id", [':id' => $id]);
     }
 }
-?>

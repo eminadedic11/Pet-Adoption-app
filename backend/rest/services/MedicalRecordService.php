@@ -1,36 +1,15 @@
 <?php
 
+require_once __DIR__ . '/BaseService.php';
 require_once __DIR__ . '/../dao/MedicalRecordDao.php';
 require_once __DIR__ . '/../dao/PetDao.php';
 
-class MedicalRecordService {
-    private $medicalRecordDao;
+class MedicalRecordService extends BaseService {
     private $petDao;
 
     public function __construct() {
-        $this->medicalRecordDao = new MedicalRecordDao();
         $this->petDao = new PetDao();
-    }
-
-    public function getAllRecords() {
-        try {
-            return $this->medicalRecordDao->getAllRecords();
-        } catch (Exception $e) {
-            throw new Exception("Error retrieving records: " . $e->getMessage());
-        }
-    }
-
-    public function getRecordById($id) {
-        try {
-            $record = $this->medicalRecordDao->getRecordById($id);
-            if (!$record) {
-                throw new Exception("No medical record found with ID {$id}.");
-            }
-
-            return $record;
-        } catch (Exception $e) {
-            throw new Exception("Error retrieving record: " . $e->getMessage());
-        }
+        parent::__construct(new MedicalRecordDao());
     }
 
     public function createRecord($recordData) {
@@ -43,12 +22,12 @@ class MedicalRecordService {
                 }
             }
 
-            $pet = $this->petDao->getPetById($recordData['pet_id']);
+            $pet = $this->petDao->getById($recordData['pet_id']);
             if (!$pet) {
                 throw new Exception("Pet not found.");
             }
 
-            return $this->medicalRecordDao->addRecord($recordData);
+            return $this->add($recordData);
         } catch (Exception $e) {
             throw new Exception("Error creating record: " . $e->getMessage());
         }
@@ -60,20 +39,18 @@ class MedicalRecordService {
                 throw new Exception("Medical record ID is required to update.");
             }
 
-            $existingRecord = $this->medicalRecordDao->getRecordById($recordData['medical_record_id']);
-            if (!$existingRecord) {
+            $existing = $this->dao->getById($recordData['medical_record_id']);
+            if (!$existing) {
                 throw new Exception("No medical record found with ID {$recordData['medical_record_id']}.");
             }
 
-            $updatedData = array_filter($recordData, function($value) {
-                return !empty($value);
-            });
+            $updatedData = array_filter($recordData, fn($value) => !empty($value));
 
             if (empty($updatedData)) {
                 throw new Exception("No data to update.");
             }
 
-            return $this->medicalRecordDao->updateRecord($updatedData);
+            return $this->update($updatedData);
         } catch (Exception $e) {
             throw new Exception("Error updating record: " . $e->getMessage());
         }
@@ -85,16 +62,22 @@ class MedicalRecordService {
                 throw new Exception("Medical record ID is required to delete.");
             }
 
-            $existingRecord = $this->medicalRecordDao->getRecordById($id);
-            if (!$existingRecord) {
+            $existing = $this->dao->getById($id);
+            if (!$existing) {
                 throw new Exception("No medical record found with ID {$id}.");
             }
 
-            return $this->medicalRecordDao->deleteRecord($id);
+            return $this->delete($id);
         } catch (Exception $e) {
             throw new Exception("Error deleting record: " . $e->getMessage());
         }
     }
-}
 
-?>
+    public function getRecordById($id) {
+        return $this->getById($id);
+    }
+
+    public function getAllRecords() {
+        return $this->getAll();
+    }
+}

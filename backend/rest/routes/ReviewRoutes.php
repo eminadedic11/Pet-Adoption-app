@@ -14,11 +14,7 @@ Flight::group('/reviews', function () {
      * )
      */
     Flight::route('GET /', function () use ($service) {
-        try {
-            Flight::json($service->getAllReviews());
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        Flight::json($service->getAll());
     });
 
     /**
@@ -36,11 +32,7 @@ Flight::group('/reviews', function () {
      * )
      */
     Flight::route('GET /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->getReviewById($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->getById($id));
     });
 
     /**
@@ -61,13 +53,9 @@ Flight::group('/reviews', function () {
      * )
      */
     Flight::route('POST /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            $id = $service->createReview($data);
-            Flight::json(["review_id" => $id], 201);
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        $id = $service->add($data);
+        Flight::json(["review_id" => $id], 201);
     });
 
     /**
@@ -88,12 +76,8 @@ Flight::group('/reviews', function () {
      * )
      */
     Flight::route('PUT /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            Flight::json($service->updateReview($data));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        Flight::json($service->update($data));
     });
 
     /**
@@ -111,12 +95,6 @@ Flight::group('/reviews', function () {
      * )
      */
     Flight::route('DELETE /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->deleteReview($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->delete($id));
     });
 });
-
-?>

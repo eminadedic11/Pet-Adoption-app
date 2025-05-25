@@ -15,36 +15,43 @@ class BaseDao {
         try {
             $this->connection = new PDO("mysql:host=$servername;port=$port;dbname=$database", $username, $password);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-           // echo "Connected successfully";
         } catch(PDOException $e) {
             die("Connection failed: " . $e->getMessage());
         }
     }
 
     public function query($sql, $params = []) {
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        try {
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function fetchAll($sql, $params = []) {
-        return $this->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->query($sql, $params);
+        if (!$stmt) return false;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
     public function fetchOne($sql, $params = []) {
-        return $this->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->query($sql, $params);
+        if (!$stmt) return false;
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     }
 
     public function execute($sql, $params = []) {
-        $stmt = $this->connection->prepare($sql);
-        return $stmt->execute($params);
+        try {
+            $stmt = $this->connection->prepare($sql);
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function lastInsertId() {
         return $this->connection->lastInsertId();
     }
 }
-
-$baseDao = new BaseDao();
-
-?>
