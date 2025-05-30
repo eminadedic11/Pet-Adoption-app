@@ -10,20 +10,16 @@
  *         name="Emina Dedic"
  *     )
  * )
- */
-
-/**
+ *
  * @OA\Server(
- *      url="http://localhost:80/pet-adoption-app/backend",
- *      description="API server"
+ *     url="http://localhost:80/pet-adoption-app/backend",
+ *     description="API server"
  * )
-*/
-
-/**
+ *
  * @OA\SecurityScheme(
- *     securityScheme="ApiKey",
- *     type="apiKey",
- *     in="header",
- *     name="Authentication"
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
  * )
  */

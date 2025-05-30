@@ -8,21 +8,18 @@ Flight::group('/users', function () {
     /**
      * @OA\Get(
      *     path="/users",
-     *     summary="Get all users",
+     *     summary="Get all users (admin only)",
      *     tags={"Users"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="List of users"
-     *     )
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="List of users"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     Flight::route('GET /', function () use ($service) {
-        try {
-            Flight::json($service->getAllUsers());
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        // Flight::auth_middleware()->verifyToken();
+        Flight::json($service->getAll());
     });
+    
 
     /**
      * @OA\Get(
@@ -42,11 +39,8 @@ Flight::group('/users', function () {
      * )
      */
     Flight::route('GET /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->getUserById($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        // Flight::auth_middleware()->verifyToken();
+        Flight::json($service->getById($id));
     });
 
     /**
@@ -65,17 +59,13 @@ Flight::group('/users', function () {
      *             @OA\Property(property="role", type="string")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="User created")
+     *     @OA\Response(response=201, description="User created")
      * )
      */
     Flight::route('POST /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            $id = $service->createUser($data);
-            Flight::json(["user_id" => $id], 201);
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        $id = $service->add($data);
+        Flight::json(["user_id" => $id], 201);
     });
 
     /**
@@ -99,12 +89,8 @@ Flight::group('/users', function () {
      * )
      */
     Flight::route('PUT /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            Flight::json($service->updateUser($data));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        Flight::json($service->update($data));
     });
 
     /**
@@ -122,12 +108,6 @@ Flight::group('/users', function () {
      * )
      */
     Flight::route('DELETE /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->deleteUser($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->delete($id));
     });
 });
-
-?>

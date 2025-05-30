@@ -14,11 +14,7 @@ Flight::group('/records', function () {
      * )
      */
     Flight::route('GET /', function () use ($service) {
-        try {
-            Flight::json($service->getAllRecords());
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        Flight::json($service->getAll());
     });
 
     /**
@@ -36,11 +32,7 @@ Flight::group('/records', function () {
      * )
      */
     Flight::route('GET /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->getRecordById($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->getById($id));
     });
 
     /**
@@ -62,13 +54,9 @@ Flight::group('/records', function () {
      * )
      */
     Flight::route('POST /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            $id = $service->createRecord($data);
-            Flight::json(["medical_record_id" => $id], 201);
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        $id = $service->add($data);
+        Flight::json(["medical_record_id" => $id], 201);
     });
 
     /**
@@ -79,7 +67,7 @@ Flight::group('/records', function () {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"medical_record_id", "vaccinations", "medical_conditions", "last_checkup_date", "pet_id"},
+     *             required={"medical_record_id"},
      *             @OA\Property(property="medical_record_id", type="integer"),
      *             @OA\Property(property="vaccinations", type="string"),
      *             @OA\Property(property="medical_conditions", type="string"),
@@ -91,12 +79,8 @@ Flight::group('/records', function () {
      * )
      */
     Flight::route('PUT /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            Flight::json($service->updateRecord($data));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        Flight::json($service->update($data));
     });
 
     /**
@@ -114,12 +98,6 @@ Flight::group('/records', function () {
      * )
      */
     Flight::route('DELETE /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->deleteRecord($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->delete($id));
     });
 });
-
-?>

@@ -14,12 +14,46 @@ Flight::group('/adoptions', function () {
      * )
      */
     Flight::route('GET /', function () use ($service) {
-        try {
-            Flight::json($service->getAllAdoptions());
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        Flight::json($service->getAll());
     });
+
+
+    /**
+     * @OA\Get(
+     *     path="/adoptions/pending",
+     *     summary="Get all pending adoption requests (admin only)",
+     *     tags={"Adoptions"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="List of pending adoption requests"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
+    Flight::route('GET /pending', function () use ($service) {
+        Flight::auth_middleware()->authorizeRole('admin');
+
+        $result = $service->getPendingRequestsWithUserAndPet();
+        
+        if (!$result) {
+            Flight::json([], 200);
+        }
+
+        Flight::json($result);
+    });
+
+    /**
+     * @OA\Get(
+     *     path="/adoptions/approved",
+     *     summary="Get all approved adoptions with pet info",
+     *     tags={"Adoptions"},
+     *     @OA\Response(response=200, description="List of approved adoptions")
+     * )
+     */
+    Flight::route('GET /approved', function () use ($service) {
+        Flight::json($service->getApprovedAdoptedPets());
+    });
+
+
 
     /**
      * @OA\Get(
@@ -36,11 +70,7 @@ Flight::group('/adoptions', function () {
      * )
      */
     Flight::route('GET /@id', function ($id) use ($service) {
-        try {
-            Flight::json($service->getAdoptionById($id));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
-        }
+        Flight::json($service->getById($id));
     });
 
     /**
@@ -51,9 +81,8 @@ Flight::group('/adoptions', function () {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"status", "request_date", "user_id", "pet_id"},
+     *             required={"status", "user_id", "pet_id"},
      *             @OA\Property(property="status", type="string"),
-     *             @OA\Property(property="request_date", type="string", format="date"),
      *             @OA\Property(property="user_id", type="integer"),
      *             @OA\Property(property="pet_id", type="integer")
      *         )
@@ -62,13 +91,10 @@ Flight::group('/adoptions', function () {
      * )
      */
     Flight::route('POST /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            $id = $service->createAdoption($data);
-            Flight::json(["adoption_id" => $id], 201);
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        $data['request_date'] = date('Y-m-d');
+        $id = $service->add($data);
+        Flight::json(["adoption_id" => $id], 201);
     });
 
     /**
@@ -79,7 +105,7 @@ Flight::group('/adoptions', function () {
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"adoption_id", "status", "request_date", "user_id", "pet_id"},
+     *             required={"adoption_id"},
      *             @OA\Property(property="adoption_id", type="integer"),
      *             @OA\Property(property="status", type="string"),
      *             @OA\Property(property="request_date", type="string", format="date"),
@@ -91,12 +117,8 @@ Flight::group('/adoptions', function () {
      * )
      */
     Flight::route('PUT /', function () use ($service) {
-        try {
-            $data = Flight::request()->data->getData();
-            Flight::json($service->updateAdoption($data));
-        } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 400);
-        }
+        $data = Flight::request()->data->getData();
+        Flight::json($service->update($data));
     });
 
     /**
@@ -114,12 +136,65 @@ Flight::group('/adoptions', function () {
      * )
      */
     Flight::route('DELETE /@id', function ($id) use ($service) {
+        Flight::json($service->delete($id));
+    });
+
+    /**
+     * @OA\Post(
+     *     path="/adoptions/adopt",
+     *     summary="Adopt a pet",
+     *     tags={"Adoptions"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"user_id", "pet_id"},
+     *             @OA\Property(property="user_id", type="integer"),
+     *             @OA\Property(property="pet_id", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Pet adopted")
+     * )
+     */
+    Flight::route('POST /adopt', function () use ($service) {
+        $data = Flight::request()->data->getData();
+        $result = $service->adoptPet($data['user_id'], $data['pet_id']);
+        Flight::json($result);
+
+    });
+
+    /**
+     * @OA\Patch(
+     *     path="/adoptions/{id}/approve",
+     *     summary="Approve an adoption request (admin only)",
+     *     tags={"Adoptions"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Adoption approved"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Adoption not found")
+     * )
+     */
+    Flight::route('PATCH /@id/approve', function ($id) use ($service) {
+        Flight::auth_middleware()->authorizeRole('admin');
+
         try {
-            Flight::json($service->deleteAdoption($id));
+            $service->approveAdoption($id);
+            Flight::json(['message' => 'Adoption approved.']);
         } catch (Exception $e) {
-            Flight::json(['error' => $e->getMessage()], 404);
+            Flight::halt(404, $e->getMessage());
         }
     });
-});
 
-?>
+    
+
+    
+
+
+
+    
+});

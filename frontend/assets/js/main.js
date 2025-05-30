@@ -60,8 +60,6 @@
 
 	$('nav .dropdown').hover(function(){
 		var $this = $(this);
-		// 	 timer;
-		// clearTimeout(timer);
 		$this.addClass('show');
 		$this.find('> a').attr('aria-expanded', true);
 		// $this.find('.dropdown-menu').addClass('animated-fast fadeInUp show');
@@ -182,6 +180,8 @@
 	});
 
 	$('.appointment_time').timepicker();
+
+	
 
 })(jQuery);
 
